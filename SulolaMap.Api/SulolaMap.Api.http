@@ -1,0 +1,6 @@
+@SulolaMap.Api_HostAddress = http://localhost:5167
+
+GET {{SulolaMap.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
