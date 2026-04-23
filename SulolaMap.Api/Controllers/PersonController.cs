@@ -1,0 +1,37 @@
+﻿using Application.Interfaces;
+using Domain.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace SulolaMap.Api.Controllers
+{
+    public class PersonController : BaseController
+    {
+        private readonly IPersonService personService;
+
+        public PersonController(IPersonService personService)
+        {
+            this.personService = personService;
+        }
+
+        [HttpPost]
+        public async Task<ResponseModel<bool>> CreatePerson(PersonDto personDto)
+            => await personService.CreatedPersonAsync(personDto);
+
+        [HttpDelete]
+        public async Task<ResponseModel<bool>> DeletePerson(Guid personId)
+            => await personService.DeletePersonAsync(personId);
+
+        [HttpGet]
+        public async Task<ResponseModel<PagedResult<PersonDto>>> GetAllPersons([FromQuery] FilterModel filterModel)
+            => await personService.GetAllPersonsAsync(filterModel);
+
+        [HttpGet]
+        public async Task<ResponseModel<PersonDto>> GetPersonById(Guid personId)
+            => await personService.GetPersonByIdAsync(personId);
+
+        [HttpPut]
+        public async Task<ResponseModel<bool>> UpdatePerson(PersonDto personDto)
+            => await personService.UpdatePersonAsync(personDto);
+    }
+}
