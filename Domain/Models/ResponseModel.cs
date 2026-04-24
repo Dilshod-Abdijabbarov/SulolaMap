@@ -22,5 +22,12 @@ namespace Domain.Models
             StatusCode = statusCode;
             Error = error;
         }
+
+        public ResponseModel(string error,T result, HttpStatusCode statusCode)
+        {
+            StatusCode = statusCode;
+            Result = result;
+            Error = error;
+        }
     }
 }

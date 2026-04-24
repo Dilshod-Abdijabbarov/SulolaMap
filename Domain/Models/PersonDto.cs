@@ -8,7 +8,7 @@ namespace Domain.Models;
 
 public class PersonDto
 {
-    public Guid Id { get; set; }
+    public Guid? Id { get; set; }
     public Guid? ParentSpouseId { get; set; }
     public string? Pinfl { get; set; }
     public string FirstName { get; set; }
@@ -28,14 +28,6 @@ public class PersonDto
     public string? Biography { get; set; }
     public string? TelegramLink { get; set; }
     public string? InstagramLink { get; set; }
-    public Guid CreatedBy { get; set; }
+    public Guid? CreatedBy { get; set; } 
     public string? Description { get; set; }
-
-    // Agar bu kishi ER bo'lsa, uning xotinlari bilan bog'liqliklari
-    [InverseProperty("Husband")]
-    public virtual ICollection<Spouse> MarriagesAsHusband { get; set; }
-
-    // Agar bu kishi XOTIN bo'lsa, uning erlari bilan bog'liqliklari
-    [InverseProperty("Wife")]
-    public virtual ICollection<Spouse> MarriagesAsWife { get; set; }
 }

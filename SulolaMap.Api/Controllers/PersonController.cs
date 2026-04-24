@@ -2,6 +2,7 @@
 using Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace SulolaMap.Api.Controllers
 {
@@ -33,5 +34,17 @@ namespace SulolaMap.Api.Controllers
         [HttpPut]
         public async Task<ResponseModel<bool>> UpdatePerson(PersonDto personDto)
             => await personService.UpdatePersonAsync(personDto);
+
+        [HttpPost]
+        public async Task<ResponseModel<bool>> AddSpouse(SpouseDto spouseDto)
+            => await personService.AddSpouseAsync(spouseDto);
+
+        [HttpGet]
+        public async Task<ResponseModel<PagedResult<SpouseViewDto>>> GetAllSpouses([FromQuery] FilterModel filterModel)
+            => await personService.GetAllSpousesAsync(filterModel);
+
+        [HttpPut]
+        public async Task<ResponseModel<bool>> AssignParents(AssignParentDto assignParent)
+            => await personService.AssignParentsAsync(assignParent);
     }
 }
