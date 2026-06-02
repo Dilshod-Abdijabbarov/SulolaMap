@@ -37,7 +37,7 @@ namespace Infrastructure.db
             // Bolalar va nikoh bog'liqligi
             modelBuilder.Entity<Person>()
                 .HasOne(p => p.BornFromMarriage)
-                .WithMany(s => s.Children)
+                .WithMany(s => s.Childrens)
                 .HasForeignKey(p => p.ParentSpouseId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

@@ -27,7 +27,7 @@ namespace Domain.Entity
         public virtual Person Wife { get; set; }
 
         // Bu nikohdan tug'ilgan bolalar ro'yxati
-        public virtual ICollection<Person> Children { get; set; }
+        public virtual ICollection<Person> Childrens { get; set; }
     }
 
 }

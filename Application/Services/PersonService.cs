@@ -49,7 +49,11 @@ namespace Application.Services
 
         public async Task<ResponseModel<PagedResult<PersonDto>>> GetAllPersonsAsync(FilterModel filterModel)
         {
-            var persons = dbContext.Persons;
+            var persons = dbContext.Persons.AsQueryable();
+
+            filterModel.PageSize = filterModel.PageSize == 0 ? 10 : filterModel.PageSize;
+
+            persons = persons.ApplyFilters(filterModel.Filters);
 
             var result = new PagedResult<PersonDto>();
 
@@ -88,7 +92,7 @@ namespace Application.Services
             {
                 var parent = await dbContext.Persons.FirstOrDefaultAsync(p => p.Id == personDto.ParentSpouseId);
 
-                
+
             }
 
             person.FirstName = personDto.FirstName;
@@ -120,21 +124,21 @@ namespace Application.Services
 
         public async Task<ResponseModel<bool>> AddSpouseAsync(SpouseDto spouseDto)
         {
-            var husband = await dbContext.Persons.FirstOrDefaultAsync(x=>x.Id == spouseDto.HusbandId);
+            var husband = await dbContext.Persons.FirstOrDefaultAsync(x => x.Id == spouseDto.HusbandId);
 
-            if(husband == null)
-                return new("Husband not found.",HttpStatusCode.NotFound);
+            if (husband == null)
+                return new("Husband not found.", HttpStatusCode.NotFound);
 
-            var wife = await dbContext.Persons.FirstOrDefaultAsync(x=>x.Id == spouseDto.WifeId);
+            var wife = await dbContext.Persons.FirstOrDefaultAsync(x => x.Id == spouseDto.WifeId);
 
             if (husband == null)
                 return new("Wife not found.", HttpStatusCode.NotFound);
 
-            var spouses = await dbContext.Spouses.Where(x => x.HusbandId == husband.Id).OrderByDescending(x=>x.Order).ToListAsync();
+            var spouses = await dbContext.Spouses.Where(x => x.HusbandId == husband.Id).OrderByDescending(x => x.Order).ToListAsync();
 
-            var order = spouses?.FirstOrDefault()?.Order??1;
+            var order = spouses?.FirstOrDefault()?.Order ?? 1;
 
-            if(!spouses.Any(x=>x.WifeId == wife?.Id))
+            if (!spouses.Any(x => x.WifeId == wife?.Id))
             {
                 var spouse = new Spouse
                 {
@@ -153,7 +157,7 @@ namespace Application.Services
                 return new(false);
             }
 
-            return new("Already added",true,HttpStatusCode.OK);
+            return new("Already added", true, HttpStatusCode.OK);
         }
 
         public async Task<ResponseModel<PagedResult<SpouseViewDto>>> GetAllSpousesAsync(FilterModel filterModel)
@@ -167,7 +171,7 @@ namespace Application.Services
             result.TotalItems = await spouses.CountAsync();
 
             var data = await spouses
-                .Skip(filterModel.PageNumber*filterModel.PageSize)
+                .Skip(filterModel.PageNumber * filterModel.PageSize)
                 .Take(filterModel.PageSize)
                 .ToListAsync();
 
@@ -185,8 +189,8 @@ namespace Application.Services
 
             var spouse = await dbContext.Spouses.FirstOrDefaultAsync(x => x.Id == assignParent.SpouseId);
 
-            if(spouse == null)
-                return new("Parents not found.",HttpStatusCode.NotFound);
+            if (spouse == null)
+                return new("Parents not found.", HttpStatusCode.NotFound);
 
             person.ParentSpouseId = spouse.Id;
             person.BornFromMarriage = spouse;
@@ -198,6 +202,16 @@ namespace Application.Services
                 return new(true);
 
             return new(false);
+        }
+
+        public async Task<ResponseModel<Spouse>> GetSpouseByIdAsync(Guid spouseId)
+        {
+            var spouse = await dbContext.Spouses.Include(x=>x.Childrens).FirstOrDefaultAsync(x => x.Id == spouseId);
+
+            if (spouse == null)
+                return new("Spouse not found.", HttpStatusCode.NotFound);
+
+            return new(spouse);
         }
     }
 }

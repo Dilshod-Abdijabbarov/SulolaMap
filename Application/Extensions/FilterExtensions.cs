@@ -100,7 +100,6 @@ public static class FilterExtensions
             .Take(pageSize)
             .ToListAsync();
 
-
         return new PagedResult<T>
         {
             Items = items,

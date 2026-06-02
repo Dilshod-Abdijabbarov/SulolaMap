@@ -23,7 +23,7 @@ namespace SulolaMap.Api.Controllers
         public async Task<ResponseModel<bool>> DeletePerson(Guid personId)
             => await personService.DeletePersonAsync(personId);
 
-        [HttpGet]
+        [HttpPost]
         public async Task<ResponseModel<PagedResult<PersonDto>>> GetAllPersons([FromQuery] FilterModel filterModel)
             => await personService.GetAllPersonsAsync(filterModel);
 
