@@ -24,6 +24,11 @@ namespace Application.Services
         {
             var person = mapper.Map<Person>(personDto);
 
+            var generation = await dbContext.Generations.FindAsync(personDto.GenerationId);
+
+            if (generation != null)
+                person.Generation = generation;
+
             person.Id = Guid.NewGuid();
             person.CreatedBy = Guid.NewGuid();
             await dbContext.Persons.AddAsync(person);
@@ -91,14 +96,17 @@ namespace Application.Services
             if (personDto.ParentSpouseId is not null)
             {
                 var parent = await dbContext.Persons.FirstOrDefaultAsync(p => p.Id == personDto.ParentSpouseId);
-
-
             }
+
+            var generation = await dbContext.Generations.FindAsync(personDto.GenerationId);
+
+            if(generation != null)
+                person.Generation = generation;
 
             person.FirstName = personDto.FirstName;
             person.LastName = personDto.LastName;
             person.MiddleName = personDto.MiddleName;
-            person.Order = personDto.Order;
+            person.ChildOrder = personDto.Order;
             person.GenerationLevel = personDto.GenerationLevel;
             person.Gender = personDto.Gender;
             person.BirthDate = personDto.BirthDate;
@@ -113,6 +121,7 @@ namespace Application.Services
             person.TelegramLink = personDto.TelegramLink;
             person.InstagramLink = personDto.InstagramLink;
             person.Description = personDto.Description;
+            person.GenerationId = personDto.GenerationId;
 
             dbContext.Persons.Update(person);
 
@@ -194,7 +203,7 @@ namespace Application.Services
 
             person.ParentSpouseId = spouse.Id;
             person.BornFromMarriage = spouse;
-            person.Order = assignParent.Order;
+            person.ChildOrder = assignParent.Order;
 
             dbContext.Persons.Update(person);
 
@@ -213,5 +222,19 @@ namespace Application.Services
 
             return new(spouse);
         }
+
+        public async Task<ResponseModel<bool>> CreateGeneration(GenerationDto generationDto)
+        {
+            var genration = mapper.Map<Generation>(generationDto);
+            if (genration == null) return 
+                    new("Dto not found.",HttpStatusCode.NotFound);
+
+            await dbContext.Generations.AddAsync(genration);
+            if (await dbContext.SaveChangesAsync() > 0)
+                return new(true);
+
+            return new("Error",HttpStatusCode.BadRequest);
+        }
+
     }
 }

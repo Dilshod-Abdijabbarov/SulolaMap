@@ -13,6 +13,7 @@ namespace Infrastructure.db
 
         public DbSet<Person> Persons { get; set; }
         public DbSet<Spouse> Spouses { get; set; }
+        public DbSet<Generation> Generations { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

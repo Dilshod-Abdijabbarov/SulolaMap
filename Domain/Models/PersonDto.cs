@@ -25,6 +25,7 @@ public class PersonDto
     public bool IsAlive { get; set; } = true;//tirik yoki vafot etganligini bildiradi
     public DateTime? DeathDate { get; set; }
     public string? BirthPlace { get; set; }
+    public Guid GenerationId { get; set; }
     public string? Biography { get; set; }
     public string? TelegramLink { get; set; }
     public string? InstagramLink { get; set; }

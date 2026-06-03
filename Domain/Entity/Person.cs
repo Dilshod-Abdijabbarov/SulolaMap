@@ -38,8 +38,8 @@ namespace Domain.Entity
         public Gender Gender { get; set; }
 
         [Required]
-        [Column("order")]
-        public int Order { get; set; } = 1;
+        [Column("child_order")]
+        public int ChildOrder { get; set; } = 1;
         // shajara tartibi.1-farzand,2-farzand, va hakazo.
 
         [Required]
@@ -78,6 +78,9 @@ namespace Domain.Entity
         [Column("description")]
         public string? Description { get; set; }
 
+        [Column("generation_id")]
+        public Guid? GenerationId { get; set; }
+
         // Agar bu kishi ER bo'lsa, uning xotinlari bilan bog'liqliklari
         [InverseProperty("Husband")]
         public virtual ICollection<Spouse> MarriagesAsHusband { get; set; }
@@ -89,5 +92,7 @@ namespace Domain.Entity
         // Bu kishi qaysi nikohdan (ota-onadan) tug'ilgani
         [ForeignKey("ParentSpouseId")]
         public virtual Spouse? BornFromMarriage { get; set; }
+
+        public Generation Generation { get; set; }
     }
 }
