@@ -13,4 +13,7 @@ public interface IPersonService
     Task<ResponseModel<bool>> AddSpouseAsync(SpouseDto spouseDto);
     Task<ResponseModel<PagedResult<SpouseViewDto>>> GetAllSpousesAsync(FilterModel filterModel);
     Task<ResponseModel<bool>> AssignParentsAsync(AssignParentDto assignParent);
+    Task<ResponseModel<Guid>> CreateGenerationAsync(GenerationDto generationDto);
+    Task<ResponseModel<bool>> AssignGenerationAsync(AssignGenerationDto assignGeneration);
+    Task<ResponseModel<GenerationViewDto>> GetByGenerationId(Guid generationId);
 }

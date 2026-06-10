@@ -12,6 +12,7 @@ namespace Application.Mapping
             CreateMap<PersonDto,Person>().ReverseMap();
             CreateMap<SpouseViewDto,Spouse>().ReverseMap();
             CreateMap<SpouseDto,Spouse>().ReverseMap();
+            CreateMap<GenerationDto, Generation>().ReverseMap();
         }
     }
 }

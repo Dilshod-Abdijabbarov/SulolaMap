@@ -24,7 +24,7 @@ namespace SulolaMap.Api.Controllers
             => await personService.DeletePersonAsync(personId);
 
         [HttpPost]
-        public async Task<ResponseModel<PagedResult<PersonDto>>> GetAllPersons([FromQuery] FilterModel filterModel)
+        public async Task<ResponseModel<PagedResult<PersonDto>>> GetAllPersons([FromBody] FilterModel filterModel)
             => await personService.GetAllPersonsAsync(filterModel);
 
         [HttpGet]
@@ -46,5 +46,17 @@ namespace SulolaMap.Api.Controllers
         [HttpPut]
         public async Task<ResponseModel<bool>> AssignParents(AssignParentDto assignParent)
             => await personService.AssignParentsAsync(assignParent);
+
+        [HttpPost]
+        public async Task<ResponseModel<Guid>> CreateGeneration(GenerationDto generationDto)
+           => await personService.CreateGenerationAsync(generationDto);
+
+        [HttpPut]
+        public async Task<ResponseModel<bool>> AssignGeneration(AssignGenerationDto assignGeneration)
+           => await personService.AssignGenerationAsync(assignGeneration);
+
+        [HttpGet]
+        public async Task<ResponseModel<GenerationViewDto>> GetByGenerationId(Guid generationId)
+            => await personService.GetByGenerationId(generationId);
     }
 }

@@ -223,17 +223,96 @@ namespace Application.Services
             return new(spouse);
         }
 
-        public async Task<ResponseModel<bool>> CreateGeneration(GenerationDto generationDto)
+        public async Task<ResponseModel<Guid>> CreateGenerationAsync(GenerationDto generationDto)
         {
-            var genration = mapper.Map<Generation>(generationDto);
-            if (genration == null) return 
-                    new("Dto not found.",HttpStatusCode.NotFound);
+            var generation = mapper.Map<Generation>(generationDto);
 
-            await dbContext.Generations.AddAsync(genration);
+            if (generation == null) 
+                return  new("Dto not found.", HttpStatusCode.NotFound);
+
+            generation.Id = Guid.NewGuid();
+            generation.CreatedAt = DateTime.UtcNow.AddHours(5);
+            await dbContext.Generations.AddAsync(generation);
+
+            if (await dbContext.SaveChangesAsync() > 0)
+                return new(generation.Id);
+
+            return new("Error", HttpStatusCode.BadRequest);
+        }
+
+        public async Task<ResponseModel<bool>> AssignGenerationAsync(AssignGenerationDto assignGeneration)
+        {
+            var person = await dbContext.Persons.FindAsync(assignGeneration.PersonId);
+
+            if (person == null)
+                return new("Person not found.", HttpStatusCode.NotFound);
+
+            var generation = await dbContext.Generations.FindAsync(assignGeneration.GenerationId);
+
+            if (generation == null)
+                return new("Generation not found.", HttpStatusCode.NotFound);
+
+            person.GenerationId = generation.Id;
+            person.Generation = generation;
+
+            dbContext.Persons.Update(person);
+
             if (await dbContext.SaveChangesAsync() > 0)
                 return new(true);
 
-            return new("Error",HttpStatusCode.BadRequest);
+            return new(false);
+        }
+
+        public async Task<ResponseModel<GenerationViewDto>> GetByGenerationId(Guid generationId)
+        {
+            var correntDate = DateTime.UtcNow.AddHours(5);
+            var generation = await dbContext.Generations.Where(x=>x.Id == generationId && x.IsActive)
+                .Include(x => x.Persons).FirstOrDefaultAsync();
+
+            if (generation == null)
+                return new("Generation not found.", HttpStatusCode.NotFound);
+
+            if(generation.ExpireDate < correntDate)
+            {
+                generation.IsActive = false;
+                dbContext.Generations.Update(generation);
+                await dbContext.SaveChangesAsync();
+                return new("Generation expired.", HttpStatusCode.BadRequest);
+            }
+
+            var persons = generation.Persons.Select(x => new PersonDto
+            {
+                Id = x.Id,
+                Pinfl = x.Pinfl,
+                Gender = x.Gender,
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                MiddleName = x.MiddleName,
+                Biography = x.Biography,
+                BirthDate = x.BirthDate,
+                BirthPlace = x.BirthPlace,
+                GenerationId = x.GenerationId,
+                Description = x.Description,
+                GenerationLevel = x.GenerationLevel,
+                IsAlive = x.IsAlive,
+                PhoneNumber = x.PhoneNumber,
+                PhotoUrl = x.PhotoUrl,
+                InstagramLink = x.InstagramLink,
+                TelegramLink = x.TelegramLink,
+                DeathDate = x.DeathDate,
+                Order = x.ChildOrder,
+                ParentSpouseId = x.ParentSpouseId
+            }).ToList();
+
+            var generationDto = new GenerationViewDto
+            {
+                Id = generation.Id,
+                Name = generation.Name,
+                Description = generation.Description,
+                Persons = persons
+            };
+
+            return new(generationDto);
         }
 
     }
