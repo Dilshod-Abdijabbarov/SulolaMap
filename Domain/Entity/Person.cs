@@ -14,6 +14,9 @@ namespace Domain.Entity
         [Column("parent_spouse_id")]
         public Guid? ParentSpouseId { get; set; }
 
+        [Column("parent_id")]
+        public Guid? ParentId { get; set; }
+
         [Column("pinfl")]
         public string? Pinfl { get; set; }
 

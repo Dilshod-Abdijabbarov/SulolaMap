@@ -10,6 +10,7 @@ public class PersonDto
 {
     public Guid? Id { get; set; }
     public Guid? ParentSpouseId { get; set; }
+    public Guid? ParentId { get; set; }
     public string? Pinfl { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }

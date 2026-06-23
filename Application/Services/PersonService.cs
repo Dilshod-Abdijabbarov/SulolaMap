@@ -74,17 +74,38 @@ namespace Application.Services
             return new(result);
         }
 
-        public async Task<ResponseModel<PersonDto>> GetPersonByIdAsync(Guid personId)
+        public async Task<ResponseModel<List<PersonDto>>> GetPersonByIdAsync(Guid sulolaId)
         {
-            var person = await dbContext.Persons.FirstOrDefaultAsync(p => p.Id == personId);
+            //var person = await dbContext.Persons.FindAsync(personId);
 
-            if (person == null)
-                return new("Person not found", HttpStatusCode.NotFound);
+            //if (person == null)
+            //    return new("Person not found", HttpStatusCode.NotFound);
 
-            var personDto = mapper.Map<PersonDto>(person);
+            var persons = await dbContext.Persons.Where(x=>x.GenerationId == sulolaId).OrderBy(x=>x.GenerationLevel).ToListAsync();
+
+
+            var personDto = mapper.Map<List<PersonDto>>(persons);
+
+            var dd = GetAllChildNormativeDoc(personDto, personDto?.FirstOrDefault()?.Id);
 
             return new(personDto);
         }
+
+        private List<PersonDto> GetAllChildNormativeDoc(List<PersonDto> persons, Guid? parentId)
+        {
+            var result = new List<PersonDto>();
+
+            var children = persons.Where(d => d.ParentId == parentId).ToList();
+
+            foreach (var child in children)
+            {
+                result.Add(child);
+                result.AddRange(GetAllChildNormativeDoc(persons, child.Id)); // Rekursiv chaqirish
+            }
+
+            return result;
+        }
+
 
         public async Task<ResponseModel<bool>> UpdatePersonAsync(PersonDto personDto)
         {
