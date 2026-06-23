@@ -83,10 +83,22 @@ namespace Application.Services
 
             var persons = await dbContext.Persons.Where(x=>x.GenerationId == sulolaId).OrderBy(x=>x.GenerationLevel).ToListAsync();
 
-
             var personDto = mapper.Map<List<PersonDto>>(persons);
 
-            var dd = GetAllChildNormativeDoc(personDto, personDto?.FirstOrDefault()?.Id);
+            var data = new Dictionary<int, List<PersonDto>>();
+
+
+            for (int i = 1; i <= 7; i++)
+            {
+                var avlod = personDto.Where(x => x.GenerationLevel == i).ToList();
+                data.Add(i, avlod);
+                var result = new List<PersonDto>();
+                foreach (var item in avlod)
+                {
+                  result.Add(GetAllChildNormativeDoc(personDto, item.Id));
+                }
+
+            }
 
             return new(personDto);
         }
