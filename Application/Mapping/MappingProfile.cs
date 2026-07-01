@@ -10,6 +10,7 @@ namespace Application.Mapping
         public MappingProfile() 
         { 
             CreateMap<PersonDto,Person>().ReverseMap();
+            CreateMap<PersonDto1,Person>().ReverseMap();
             CreateMap<SpouseViewDto,Spouse>().ReverseMap();
             CreateMap<SpouseDto,Spouse>().ReverseMap();
             CreateMap<GenerationDto, Generation>().ReverseMap();

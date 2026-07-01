@@ -33,3 +33,25 @@ public class PersonDto
     public Guid? CreatedBy { get; set; } 
     public string? Description { get; set; }
 }
+public class PersonDto1
+{
+    public Guid Id { get; set; }
+    public Guid? ParentId { get; set; }
+    public Guid? ParentSpouseId { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string MiddleName { get; set; }
+    public int GenerationLevel { get; set; }
+    public int ChildOrder { get; set; }
+    public string? PhotoUrl { get; set; }
+    public bool IsAlive { get; set; }
+    public string? Description { get; set; }
+    public long? PhoneNumber { get; set; }
+    public DateTime BirthDate { get; set; }
+    public string? TelegramLink { get; set; }
+    public string? InstagramLink { get; set; }
+    public DateTime? DeathDate { get; set; }
+    public Gender Gender { get; set; }
+
+    public List<PersonDto1> Children { get; set; } = new();
+}

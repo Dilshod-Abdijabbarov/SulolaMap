@@ -28,7 +28,7 @@ namespace SulolaMap.Api.Controllers
             => await personService.GetAllPersonsAsync(filterModel);
 
         [HttpGet]
-        public async Task<ResponseModel<List<PersonDto>>> GetPersonById(Guid personId)
+        public async Task<ResponseModel<List<PersonDto1>>> GetPersonById(Guid personId)
             => await personService.GetPersonByIdAsync(personId);
 
         [HttpPut]

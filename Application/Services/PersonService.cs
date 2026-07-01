@@ -74,48 +74,85 @@ namespace Application.Services
             return new(result);
         }
 
-        public async Task<ResponseModel<List<PersonDto>>> GetPersonByIdAsync(Guid sulolaId)
+        //public async Task<ResponseModel<List<PersonDto>>> GetPersonByIdAsync(Guid sulolaId)
+        //{
+        //    //var person = await dbContext.Persons.FindAsync(personId);
+
+        //    //if (person == null)
+        //    //    return new("Person not found", HttpStatusCode.NotFound);
+
+        //    var persons = await dbContext.Persons.Where(x=>x.GenerationId == sulolaId).OrderBy(x=>x.GenerationLevel).ToListAsync();
+
+        //    var personDto = mapper.Map<List<PersonDto>>(persons);
+
+        //    var data = new Dictionary<int, List<PersonDto>>();
+
+
+        //    for (int i = 1; i <= 7; i++)
+        //    {
+        //        var avlod = personDto.Where(x => x.GenerationLevel == i).ToList();
+        //        data.Add(i, avlod);
+        //        var result = new List<PersonDto>();
+        //        foreach (var item in avlod)
+        //        {
+        //          result.Add(GetAllChildNormativeDoc(personDto, item.Id));
+        //        }
+
+        //    }
+
+        //    return new(personDto);
+        //}
+
+        //private List<PersonDto> GetAllChildNormativeDoc(List<PersonDto> persons, Guid? parentId)
+        //{
+        //    var result = new List<PersonDto>();
+
+        //    var children = persons.Where(d => d.ParentId == parentId).ToList();
+
+        //    foreach (var child in children)
+        //    {
+        //        result.Add(child);
+        //        result.AddRange(GetAllChildNormativeDoc(persons, child.Id)); // Rekursiv chaqirish
+        //    }
+
+        //    return result;
+        //}
+
+
+        public async Task<ResponseModel<List<PersonDto1>>> GetPersonByIdAsync(Guid sulolaId)
         {
-            //var person = await dbContext.Persons.FindAsync(personId);
+            var persons = await dbContext.Persons
+                .Where(x => x.GenerationId == sulolaId)
+                .OrderBy(x => x.GenerationLevel)
+                .ThenBy(x => x.ChildOrder)
+                .ToListAsync();
 
-            //if (person == null)
-            //    return new("Person not found", HttpStatusCode.NotFound);
+            var personDtos = mapper.Map<List<PersonDto1>>(persons);
 
-            var persons = await dbContext.Persons.Where(x=>x.GenerationId == sulolaId).OrderBy(x=>x.GenerationLevel).ToListAsync();
+            var roots = personDtos
+                .Where(x => x.ParentId == null || !personDtos.Any(p => p.Id == x.ParentId))
+                .OrderBy(x => x.ChildOrder)
+                .ToList();
 
-            var personDto = mapper.Map<List<PersonDto>>(persons);
-
-            var data = new Dictionary<int, List<PersonDto>>();
-
-
-            for (int i = 1; i <= 7; i++)
+            foreach (var root in roots)
             {
-                var avlod = personDto.Where(x => x.GenerationLevel == i).ToList();
-                data.Add(i, avlod);
-                var result = new List<PersonDto>();
-                foreach (var item in avlod)
-                {
-                  result.Add(GetAllChildNormativeDoc(personDto, item.Id));
-                }
-
+                BuildTree(personDtos, root);
             }
 
-            return new(personDto);
+            return new(roots);
         }
 
-        private List<PersonDto> GetAllChildNormativeDoc(List<PersonDto> persons, Guid? parentId)
+        private void BuildTree(List<PersonDto1> allPersons, PersonDto1 parent)
         {
-            var result = new List<PersonDto>();
+            parent.Children = allPersons
+                .Where(x => x.ParentId == parent.Id)
+                .OrderBy(x => x.ChildOrder)
+                .ToList();
 
-            var children = persons.Where(d => d.ParentId == parentId).ToList();
-
-            foreach (var child in children)
+            foreach (var child in parent.Children)
             {
-                result.Add(child);
-                result.AddRange(GetAllChildNormativeDoc(persons, child.Id)); // Rekursiv chaqirish
+                BuildTree(allPersons, child);
             }
-
-            return result;
         }
 
 
