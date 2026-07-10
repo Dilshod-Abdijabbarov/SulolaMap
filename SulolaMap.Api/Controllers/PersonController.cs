@@ -1,4 +1,4 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -58,5 +58,17 @@ namespace SulolaMap.Api.Controllers
         [HttpGet]
         public async Task<ResponseModel<GenerationViewDto>> GetByGenerationId(Guid generationId)
             => await personService.GetByGenerationId(generationId);
+
+        [HttpGet]
+        public async Task<ResponseModel<List<GenerationViewDto>>> GetAllGenerations()
+            => await personService.GetAllGenerationsAsync();
+
+        [HttpDelete]
+        public async Task<ResponseModel<bool>> DeleteGeneration(Guid generationId)
+            => await personService.DeleteGenerationAsync(generationId);
+
+        [HttpPut]
+        public async Task<ResponseModel<bool>> UpdateGeneration(GenerationDto generationDto)
+            => await personService.UpdateGenerationAsync(generationDto);
     }
 }

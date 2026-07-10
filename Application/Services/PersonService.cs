@@ -1,4 +1,4 @@
-﻿
+
 using Application.Extensions;
 using Application.Interfaces;
 using AutoMapper;
@@ -170,7 +170,7 @@ namespace Application.Services
 
             var generation = await dbContext.Generations.FindAsync(personDto.GenerationId);
 
-            if(generation != null)
+            if (generation != null)
                 person.Generation = generation;
 
             person.FirstName = personDto.FirstName;
@@ -285,7 +285,7 @@ namespace Application.Services
 
         public async Task<ResponseModel<Spouse>> GetSpouseByIdAsync(Guid spouseId)
         {
-            var spouse = await dbContext.Spouses.Include(x=>x.Childrens).FirstOrDefaultAsync(x => x.Id == spouseId);
+            var spouse = await dbContext.Spouses.Include(x => x.Childrens).FirstOrDefaultAsync(x => x.Id == spouseId);
 
             if (spouse == null)
                 return new("Spouse not found.", HttpStatusCode.NotFound);
@@ -297,8 +297,8 @@ namespace Application.Services
         {
             var generation = mapper.Map<Generation>(generationDto);
 
-            if (generation == null) 
-                return  new("Dto not found.", HttpStatusCode.NotFound);
+            if (generation == null)
+                return new("Dto not found.", HttpStatusCode.NotFound);
 
             generation.Id = Guid.NewGuid();
             generation.CreatedAt = DateTime.UtcNow.AddHours(5);
@@ -336,13 +336,13 @@ namespace Application.Services
         public async Task<ResponseModel<GenerationViewDto>> GetByGenerationId(Guid generationId)
         {
             var correntDate = DateTime.UtcNow.AddHours(5);
-            var generation = await dbContext.Generations.Where(x=>x.Id == generationId && x.IsActive)
+            var generation = await dbContext.Generations.Where(x => x.Id == generationId && x.IsActive)
                 .Include(x => x.Persons).FirstOrDefaultAsync();
 
             if (generation == null)
                 return new("Generation not found.", HttpStatusCode.NotFound);
 
-            if(generation.ExpireDate < correntDate)
+            if (generation.ExpireDate < correntDate)
             {
                 generation.IsActive = false;
                 dbContext.Generations.Update(generation);
@@ -385,5 +385,53 @@ namespace Application.Services
             return new(generationDto);
         }
 
+        public async Task<ResponseModel<List<GenerationViewDto>>> GetAllGenerationsAsync()
+        {
+            var generations = await dbContext.Generations
+                .Include(x => x.Persons)
+                .ToListAsync();
+
+            var result = generations.Select(generation => new GenerationViewDto
+            {
+                Id = generation.Id,
+                Name = generation.Name,
+                Description = generation.Description,
+                PersonCount = generation.Persons?.Count() ?? 0
+            }).ToList();
+
+            return new(result);
+        }
+
+        public async Task<ResponseModel<bool>> DeleteGenerationAsync(Guid generationId)
+        {
+            var generation = await dbContext.Generations.FindAsync(generationId);
+
+            if (generation == null)
+                return new("Generation not found.", HttpStatusCode.NotFound);
+
+            dbContext.Generations.Remove(generation);
+            if (await dbContext.SaveChangesAsync() > 0)
+                return new(true);
+
+            return new(false);
+        }
+
+        public async Task<ResponseModel<bool>> UpdateGenerationAsync(GenerationDto generationDto)
+        {
+            var generation = await dbContext.Generations.FindAsync(generationDto.Id);
+
+            if (generation == null)
+                return new("Generation not found.", HttpStatusCode.NotFound);
+
+            generation.Name = generationDto.Name;
+            generation.Description = generationDto.Description;
+            generation.ExpireDate = generationDto.ExpireDate;
+
+            dbContext.Generations.Update(generation);
+            if (await dbContext.SaveChangesAsync() > 0)
+                return new(true);
+
+            return new(false);
+        }
     }
 }

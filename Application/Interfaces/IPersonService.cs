@@ -1,4 +1,4 @@
-﻿
+
 using Domain.Models;
 
 namespace Application.Interfaces;
@@ -16,4 +16,7 @@ public interface IPersonService
     Task<ResponseModel<Guid>> CreateGenerationAsync(GenerationDto generationDto);
     Task<ResponseModel<bool>> AssignGenerationAsync(AssignGenerationDto assignGeneration);
     Task<ResponseModel<GenerationViewDto>> GetByGenerationId(Guid generationId);
+    Task<ResponseModel<List<GenerationViewDto>>> GetAllGenerationsAsync();
+    Task<ResponseModel<bool>> DeleteGenerationAsync(Guid generationId);
+    Task<ResponseModel<bool>> UpdateGenerationAsync(GenerationDto generationDto);
 }
