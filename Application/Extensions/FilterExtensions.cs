@@ -33,9 +33,18 @@ public static class FilterExtensions
             if (property.PropertyType == typeof(string))
             {
                 // String uchun optimal StartsWith
-                var method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-                var value = Expression.Constant(filter.Value, typeof(string));
-                comparison = Expression.Call(propertyAccess, method, value);
+                //var method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                //var value = Expression.Constant(filter.Value, typeof(string));
+                //comparison = Expression.Call(propertyAccess, method, value);
+
+                var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
+                var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+
+                var propertyToLower = Expression.Call(propertyAccess, toLowerMethod);
+                var valueToLower = Expression.Constant(filter.Value.ToLower(), typeof(string));
+
+                comparison = Expression.Call(propertyToLower, containsMethod, valueToLower);
+
             }
             else
             {

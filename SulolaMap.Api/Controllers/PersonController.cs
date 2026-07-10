@@ -39,8 +39,8 @@ namespace SulolaMap.Api.Controllers
         public async Task<ResponseModel<bool>> AddSpouse(SpouseDto spouseDto)
             => await personService.AddSpouseAsync(spouseDto);
 
-        [HttpGet]
-        public async Task<ResponseModel<PagedResult<SpouseViewDto>>> GetAllSpouses([FromQuery] FilterModel filterModel)
+        [HttpPost]
+        public async Task<ResponseModel<PagedResult<SpouseViewDto>>> GetAllSpouses([FromBody] FilterModel filterModel)
             => await personService.GetAllSpousesAsync(filterModel);
 
         [HttpPut]

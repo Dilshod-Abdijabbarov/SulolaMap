@@ -241,13 +241,26 @@ namespace Application.Services
 
         public async Task<ResponseModel<PagedResult<SpouseViewDto>>> GetAllSpousesAsync(FilterModel filterModel)
         {
-            var spouses = dbContext.Spouses.AsQueryable();
+            var spouses = dbContext.Spouses
+                .Include(x => x.Husband)
+                .Include(x => x.Wife)
+                .AsQueryable();
 
-            spouses = spouses.ApplyFilters(filterModel.Filters);
+            if (filterModel.Filters != null && filterModel.Filters.Any())
+            {
+                var personIdsQuery = dbContext.Persons.AsQueryable().ApplyFilters(filterModel.Filters).Select(x => x.Id);
+                spouses = spouses.Where(x => (x.HusbandId != null && personIdsQuery.Contains(x.HusbandId.Value)) 
+                                          || (x.WifeId != null && personIdsQuery.Contains(x.WifeId.Value)));
+            }
 
             var result = new PagedResult<SpouseViewDto>();
 
             result.TotalItems = await spouses.CountAsync();
+
+            if (!string.IsNullOrWhiteSpace(filterModel.SortField))
+            {
+                spouses = spouses.ApplySorting(filterModel.SortField, filterModel.IsDescending);
+            }
 
             var data = await spouses
                 .Skip(filterModel.PageNumber * filterModel.PageSize)
