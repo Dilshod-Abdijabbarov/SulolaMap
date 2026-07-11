@@ -58,6 +58,15 @@ namespace Application.Services
 
             filterModel.PageSize = filterModel.PageSize == 0 ? 10 : filterModel.PageSize;
 
+            if (filterModel.Filters != null && filterModel.Filters.TryGetValue("hasParentSpouse", out var hasParentSpouseVal))
+            {
+                if (bool.TryParse(hasParentSpouseVal, out var hasParentSpouse) && hasParentSpouse)
+                {
+                    persons = persons.Where(p => p.ParentSpouseId != null);
+                }
+                filterModel.Filters.Remove("hasParentSpouse");
+            }
+
             persons = persons.ApplyFilters(filterModel.Filters);
 
             var result = new PagedResult<PersonDto>();
@@ -287,6 +296,7 @@ namespace Application.Services
             person.ParentSpouseId = spouse.Id;
             person.BornFromMarriage = spouse;
             person.ChildOrder = assignParent.Order;
+            person.ParentId = spouse.HusbandId;
 
             dbContext.Persons.Update(person);
 
